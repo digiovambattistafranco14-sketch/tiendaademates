@@ -195,11 +195,24 @@ html { scrollbar-color: var(--line) transparent; }
 /* ---------- Header clásico ---------- */
 .site-header {
   position: sticky; top: 0; z-index: 30;
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  backdrop-filter: saturate(160%) blur(14px);
   border-bottom: 1px solid var(--line);
-  transition: box-shadow 240ms ease;
+  transition: transform 520ms var(--ease-drawer), box-shadow 300ms ease;
+  will-change: transform;
 }
-.site-header.is-scrolled { box-shadow: 0 8px 24px -16px rgb(40 25 10 / .35); }
+.site-header.is-scrolled { box-shadow: 0 10px 28px -18px rgb(40 25 10 / .4); }
+/* Se oculta al bajar y reaparece al subir */
+.site-header.is-hidden { transform: translateY(calc(-100% - 28px)); transition-duration: 420ms; }
+
+/* Entrada al cargar la página */
+.js-motion .header-main > *,
+.js-motion .hn-link {
+  animation: hdr-in 700ms var(--ease-out) both;
+  animation-delay: calc(var(--hi, 0) * 55ms + 80ms);
+}
+@keyframes hdr-in { from { opacity: 0; transform: translateY(-12px); } }
 
 .header-main {
   height: 76px;
@@ -211,6 +224,12 @@ html { scrollbar-color: var(--line) transparent; }
 .menu-btn { display: none; }
 
 .brand { display: inline-flex; align-items: center; color: var(--ink); text-decoration: none; }
+.brand .brand-mark { transform-origin: left center; transition: transform 420ms var(--ease-out); }
+.site-header.is-scrolled .brand .brand-mark { transform: scale(.88); }
+@media (hover: hover) and (pointer: fine) {
+  .brand:hover .brand-mark { transform: rotate(-3deg) scale(1.03); }
+  .site-header.is-scrolled .brand:hover .brand-mark { transform: rotate(-3deg) scale(.91); }
+}
 .brand-mark {
   display: block;
   height: 42px;
@@ -282,6 +301,14 @@ html { scrollbar-color: var(--line) transparent; }
 }
 .cart-count[hidden] { display: none; }
 .cart-count.is-bump { animation: bump 420ms var(--ease-out); }
+.cart-icon.is-wiggle { animation: wiggle 560ms var(--ease-out); }
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0); }
+  20% { transform: rotate(-14deg) scale(1.08); }
+  40% { transform: rotate(10deg) scale(1.08); }
+  60% { transform: rotate(-6deg); }
+  80% { transform: rotate(3deg); }
+}
 @keyframes bump {
   0% { transform: scale(1); }
   35% { transform: scale(1.3); }
@@ -294,6 +321,7 @@ html { scrollbar-color: var(--line) transparent; }
 /* Fila de categorías */
 .header-nav { border-top: 1px solid var(--line); }
 .header-nav-inner {
+  position: relative;
   display: flex; justify-content: center; gap: 4px;
   height: 48px; overflow-x: auto; scrollbar-width: none;
 }
@@ -305,17 +333,21 @@ html { scrollbar-color: var(--line) transparent; }
   font-size: .94rem; font-weight: 500; color: var(--ink-2); text-decoration: none; white-space: nowrap;
   transition: color 160ms ease;
 }
-.hn-link::after {
-  content: ""; position: absolute; left: 16px; right: 16px; bottom: -1px; height: 2px;
-  background: var(--ink); border-radius: 2px;
-  transform: scaleX(0); transition: transform 260ms var(--ease-out);
-}
-.hn-link[aria-current="true"] { color: var(--ink); font-weight: 600; }
-.hn-link[aria-current="true"]::after { transform: scaleX(1); }
+.hn-link[aria-current="true"] { color: var(--ink); }
 @media (hover: hover) and (pointer: fine) {
   .hn-link:hover { color: var(--ink); }
-  .hn-link:hover::after { transform: scaleX(1); }
 }
+/* Línea que se desliza entre categorías (transform: sin recalcular layout) */
+.hn-indicator {
+  position: absolute; left: 0; bottom: 0;
+  width: 1px; height: 2px; border-radius: 2px;
+  background: var(--ink);
+  transform-origin: left center;
+  opacity: 0;
+  transition: transform 420ms var(--ease-out), opacity 220ms ease;
+  pointer-events: none;
+}
+.hn-indicator.is-visible { opacity: 1; }
 
 @media (max-width: 900px) {
   .header-main {
@@ -1144,5 +1176,6 @@ body.has-sheet .wa-float { opacity: 0; pointer-events: none; }
     transition-property: opacity, visibility !important;
   }
   .sheet--cart .sheet-panel, .sheet--product .sheet-panel, .sheet--menu .sheet-panel { transform: none !important; }
+  .site-header.is-hidden { transform: none; }
   .toast, .announce-track p { transform: none !important; }
 }

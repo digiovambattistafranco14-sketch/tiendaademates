@@ -31,7 +31,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Figtree:wght@400..700&display=swap">
   <link rel="stylesheet" href="https://unpkg.com/lenis@1.1.13/dist/lenis.css">
   <link rel="preload" as="image" href="assets/img/p-canasta.webp" imagesrcset="assets/img/p-canasta-480.webp 480w, assets/img/p-canasta.webp 900w" imagesizes="(max-width: 640px) 100vw, 45vw">
-  <link rel="stylesheet" href="css/styles.css?v=6">
+  <link rel="stylesheet" href="css/styles.css?v=7">
   <script>
     // Activa los estados iniciales de animación sólo si hay JS y el usuario no pidió menos movimiento
     if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("js-motion");
@@ -60,15 +60,15 @@
 
   <header class="site-header" data-header>
     <div class="container header-main">
-      <button class="icon-btn menu-btn" type="button" data-menu-open aria-label="Abrir menú">
+      <button class="icon-btn menu-btn" type="button" data-menu-open aria-label="Abrir menú" style="--hi:0">
         <svg class="ic ic-list" aria-hidden="true"><use href="#i-list"></use></svg>
       </button>
 
-      <a class="brand" href="#inicio" aria-label="Tienda Mate, inicio">
+      <a class="brand" href="#inicio" aria-label="Tienda Mate, inicio" style="--hi:0">
         <span class="brand-mark" aria-hidden="true"></span>
       </a>
 
-      <div class="header-search" data-hs>
+      <div class="header-search" data-hs style="--hi:1">
         <svg class="ic ic-magnifying-glass" aria-hidden="true"><use href="#i-magnifying-glass"></use></svg>
         <label class="visually-hidden" for="hs-input">Buscar productos</label>
         <input id="hs-input" type="search" placeholder="Buscar mates, canastas, bolsos..." autocomplete="off"
@@ -76,7 +76,7 @@
         <div class="hs-results" id="hs-results" role="listbox" aria-label="Resultados" data-hs-results hidden></div>
       </div>
 
-      <div class="header-actions">
+      <div class="header-actions" style="--hi:2">
         <a class="icon-btn hide-mobile" href="https://www.instagram.com/tiendaamatee/" target="_blank" rel="noopener" aria-label="Instagram de Tienda Mate">
           <svg class="ic ic-instagram-logo" aria-hidden="true"><use href="#i-instagram-logo"></use></svg>
         </a>
@@ -95,13 +95,14 @@
 
     <nav class="header-nav" aria-label="Categorías">
       <div class="container header-nav-inner">
-        <a class="hn-link" href="#inicio" data-spy="portada">Inicio</a>
-        <button class="hn-link" type="button" data-filter-go="mates">Mates</button>
-        <button class="hn-link" type="button" data-filter-go="bolsos">Bolsos y canastas</button>
-        <button class="hn-link" type="button" data-filter-go="kits">Kits</button>
-        <a class="hn-link" href="#personalizados" data-spy="personalizados">Personalizados</a>
-        <a class="hn-link" href="#como-comprar" data-spy="como-comprar">Cómo comprar</a>
-        <a class="hn-link" href="#nosotros" data-spy="nosotros">Nosotros</a>
+        <span class="hn-indicator" aria-hidden="true" data-hn-indicator></span>
+        <a class="hn-link" href="#inicio" data-spy="portada" style="--hi:3">Inicio</a>
+        <button class="hn-link" type="button" data-filter-go="mates" style="--hi:4">Mates</button>
+        <button class="hn-link" type="button" data-filter-go="bolsos" style="--hi:5">Bolsos y canastas</button>
+        <button class="hn-link" type="button" data-filter-go="kits" style="--hi:6">Kits</button>
+        <a class="hn-link" href="#personalizados" data-spy="personalizados" style="--hi:7">Personalizados</a>
+        <a class="hn-link" href="#como-comprar" data-spy="como-comprar" style="--hi:8">Cómo comprar</a>
+        <a class="hn-link" href="#nosotros" data-spy="nosotros" style="--hi:9">Nosotros</a>
       </div>
     </nav>
   </header>
@@ -375,6 +376,6 @@
 
   <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js" defer></script>
   <script src="js/productos.js?v=6" defer></script>
-  <script src="js/app.js?v=6" defer></script>
+  <script src="js/app.js?v=7" defer></script>
 </body>
 </html>

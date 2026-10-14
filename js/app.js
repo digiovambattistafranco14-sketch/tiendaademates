@@ -70,7 +70,12 @@
   }
 
   const headerOffset = () => -(header.offsetHeight + 16);
+  let fijoTimer;
   function scrollToTarget(target) {
+    headerFijo = true;
+    header.classList.remove("is-hidden");
+    clearTimeout(fijoTimer);
+    fijoTimer = setTimeout(() => (headerFijo = false), 1600);
     if (target === "top") {
       lenis ? lenis.scrollTo(0, { duration: 1.4 }) : window.scrollTo({ top: 0, behavior: motionOK ? "smooth" : "auto" });
       return;
@@ -101,15 +106,56 @@
   $("[data-to-top]").addEventListener("click", () => scrollToTarget("top"));
 
   /* =========================================================
-     Header fijo: sombra suave cuando la página ya bajó
+     Header: sombra y logo compacto al bajar; se oculta al seguir
+     bajando y reaparece apenas el usuario sube
      ========================================================= */
-  const topSentinel = document.createElement("span");
-  topSentinel.setAttribute("aria-hidden", "true");
-  topSentinel.style.cssText = "position:absolute;top:120px;left:0;width:1px;height:1px;pointer-events:none;";
-  document.body.prepend(topSentinel);
-  if ("IntersectionObserver" in window) {
-    new IntersectionObserver(([e]) => header.classList.toggle("is-scrolled", !e.isIntersecting)).observe(topSentinel);
+  let lastY = window.scrollY;
+  let acumulado = 0; // cuánto se movió en la misma dirección (evita parpadeos)
+  let headerFijo = false; // true mientras se navega con un link (no esconder)
+  function onScroll(y) {
+    header.classList.toggle("is-scrolled", y > 40);
+    const delta = y - lastY;
+    lastY = y;
+    if (!motionOK || headerFijo) return;
+    if ((delta > 0 && acumulado < 0) || (delta < 0 && acumulado > 0)) acumulado = 0;
+    acumulado += delta;
+    const buscando = !hsResultsEl.hidden || document.activeElement === hsInputEl;
+    if (y < header.offsetHeight + 80 || buscando) header.classList.remove("is-hidden");
+    else if (acumulado > 24) header.classList.add("is-hidden");
+    else if (acumulado < -12) header.classList.remove("is-hidden");
   }
+  const hsResultsEl = $("[data-hs-results]");
+  const hsInputEl = $("[data-hs-input]");
+  if (lenis) lenis.on("scroll", ({ scroll }) => onScroll(scroll));
+  else {
+    let ticking = false;
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          onScroll(window.scrollY);
+          ticking = false;
+        });
+      },
+      { passive: true }
+    );
+  }
+  onScroll(window.scrollY);
+  // Si el usuario apoya el mouse arriba de todo, el header vuelve
+  document.addEventListener("mousemove", (e) => {
+    if (e.clientY < 24 && header.classList.contains("is-hidden")) header.classList.remove("is-hidden");
+  }, { passive: true });
+
+  /* Texto rotativo del buscador */
+  const placeholders = ["Buscar mates, canastas, bolsos...", "Probá con “imperial”", "Probá con “cuero”", "Probá con “kit viajero”"];
+  let phIdx = 0;
+  setInterval(() => {
+    if (document.hidden || document.activeElement === hsInputEl || hsInputEl.value) return;
+    phIdx = (phIdx + 1) % placeholders.length;
+    hsInputEl.placeholder = placeholders[phIdx];
+  }, 3200);
 
   /* =========================================================
      Barra de anuncios rotativa
@@ -144,14 +190,46 @@
   const spyLinks = navLinks.filter((l) => l.dataset.spy);
   const spySections = [...spyLinks.map((l) => document.getElementById(l.dataset.spy)), $("#productos")].filter(Boolean);
   let seccionActiva = "portada";
+  const indicador = $("[data-hn-indicator]");
+  let linkActivo = null;
+  let indicadorListo = false;
+  function moverIndicador(link) {
+    if (!link || !link.offsetWidth) {
+      indicador.classList.remove("is-visible");
+      return;
+    }
+    const x = link.offsetLeft + 16;
+    const w = Math.max(link.offsetWidth - 32, 1);
+    if (!indicadorListo) {
+      indicador.style.transition = "none";
+      indicador.style.transform = `translateX(${x}px) scaleX(${w})`;
+      void indicador.offsetWidth;
+      indicador.style.transition = "";
+      indicadorListo = true;
+    } else indicador.style.transform = `translateX(${x}px) scaleX(${w})`;
+    indicador.classList.add("is-visible");
+  }
   function marcarActivo() {
+    linkActivo = null;
     navLinks.forEach((l) => {
       const activo =
         l.dataset.spy === seccionActiva ||
         (seccionActiva === "productos" && l.dataset.filterGo && l.dataset.filterGo === filtro);
       l.setAttribute("aria-current", String(Boolean(activo)));
+      if (activo) linkActivo = l;
     });
+    if (!$(".header-nav-inner").matches(":hover")) moverIndicador(linkActivo);
   }
+  navLinks.forEach((l) => {
+    l.addEventListener("mouseenter", () => moverIndicador(l));
+    l.addEventListener("focus", () => moverIndicador(l));
+  });
+  $(".header-nav-inner").addEventListener("mouseleave", () => moverIndicador(linkActivo));
+  window.addEventListener("resize", () => {
+    indicadorListo = false;
+    moverIndicador(linkActivo);
+  });
+
   if ("IntersectionObserver" in window) {
     const visible = new Map();
     const spy = new IntersectionObserver(
@@ -646,11 +724,14 @@
     }
   }
 
+  const cartIcon = $(".cart-icon");
   function bump() {
     if (!motionOK) return;
-    cartCount.classList.remove("is-bump");
+    header.classList.remove("is-hidden"); // mostrar el carrito cuando se agrega algo
+    [cartCount, cartIcon].forEach((el) => el.classList.remove("is-bump", "is-wiggle"));
     void cartCount.offsetWidth;
     cartCount.classList.add("is-bump");
+    cartIcon.classList.add("is-wiggle");
   }
 
   function renderCart() {

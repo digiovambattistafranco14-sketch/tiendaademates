@@ -37,7 +37,8 @@ Estrategia: neutros + un campo de marca (durazno). Sin acentos adicionales.
 ## Header (clásico Tienda Nube, elegido por el usuario)
 
 - Barra de anuncios rotativa (3 mensajes, 4,2s, se pausa con hover).
-- Header fijo con fondo `--surface` y línea inferior; sólo suma una sombra suave al bajar. Nada se esconde ni cambia de forma.
+- Header fijo con fondo `--surface` translúcido (blur) y línea inferior. Al bajar suma sombra y el logo se achica a 0.88; si se sigue bajando (>24px acumulados) se oculta y reaparece al subir 12px. Queda visible cerca del tope, con el buscador en uso, al navegar con links y al agregar al carrito.
+- Entrada en cascada al cargar (55ms entre elementos). Línea de 2px que se desliza entre categorías (hover y sección activa). Ícono del carrito se sacude al agregar. Placeholder del buscador rota cada 3,2s.
 - Fila principal: logo a la izquierda, buscador visible al centro (máx. 560px) con resultados en vivo y teclado (flechas, Enter, Esc), Instagram y botón "Mi carrito" con contador y total a la derecha.
 - Fila de categorías centrada: Inicio, Mates, Bolsos y canastas, Kits, Personalizados, Cómo comprar, Nosotros. Subrayado de 2px en hover y en la sección activa.
 - Mobile (≤900px): menú, logo centrado y carrito; buscador a todo el ancho debajo. Menú a pantalla completa con links grandes en cascada.
