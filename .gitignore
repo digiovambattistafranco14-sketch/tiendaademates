@@ -1,0 +1,7 @@
+# Capturas de revisión y archivos temporales
+.impeccable/review/
+.playwright-mcp/
+__pycache__/
+
+# Fotos originales de Instagram (la web usa las versiones optimizadas de assets/img)
+fotos-originales/
